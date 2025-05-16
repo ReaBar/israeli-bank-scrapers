@@ -1,18 +1,21 @@
-import moment, { Moment } from 'moment';
-import { Page } from 'puppeteer';
-import { BaseScraperWithBrowser, LoginResults, PossibleLoginResults } from './base-scraper-with-browser';
+import moment, { type Moment } from 'moment';
+import { type Frame, type Page } from 'puppeteer';
+import { SHEKEL_CURRENCY, SHEKEL_CURRENCY_SYMBOL } from '../constants';
 import {
-  fillInput,
   clickButton,
-  waitUntilElementFound,
-  pageEvalAll,
   elementPresentOnPage,
+  fillInput,
+  pageEvalAll,
+  waitUntilElementFound,
 } from '../helpers/elements-interactions';
 import { waitForNavigation } from '../helpers/navigation';
-import { SHEKEL_CURRENCY } from '../constants';
+import { sleep } from '../helpers/waiting';
 import {
-  TransactionsAccount, Transaction, TransactionStatuses, TransactionTypes,
+  TransactionStatuses, TransactionTypes,
+  type Transaction,
+  type TransactionsAccount,
 } from '../transactions';
+import { BaseScraperWithBrowser, LoginResults, type PossibleLoginResults } from './base-scraper-with-browser';
 
 const DATE_FORMAT = 'DD/MM/YYYY';
 const NO_TRANSACTION_IN_DATE_RANGE_TEXT = 'לא נמצאו נתונים בנושא המבוקש';
@@ -31,6 +34,7 @@ const COMPLETED_TRANSACTIONS_TABLE = 'table#dataTable077';
 const PENDING_TRANSACTIONS_TABLE = 'table#dataTable023';
 const NEXT_PAGE_LINK = 'a#Npage.paging';
 const CURRENT_BALANCE = '.main_balance';
+const IFRAME_NAME = 'iframe-old-pages';
 
 type TransactionsColsTypes = Record<string, number>;
 type TransactionsTrTds = string[];
@@ -46,10 +50,12 @@ interface ScrapedTransaction {
   status: TransactionStatuses;
 }
 
-
 export function getPossibleLoginResults(): PossibleLoginResults {
   const urls: PossibleLoginResults = {};
-  urls[LoginResults.Success] = [/FibiMenu\/Online/];
+  urls[LoginResults.Success] = [
+    /fibi.*accountSummary/,  // New UI pattern
+    /FibiMenu\/Online/,       // Old UI pattern
+  ];
   urls[LoginResults.InvalidPassword] = [/FibiMenu\/Marketing\/Private\/Home/];
   return urls;
 }
@@ -62,7 +68,8 @@ export function createLoginFields(credentials: ScraperSpecificCredentials) {
 }
 
 function getAmountData(amountStr: string) {
-  const amountStrCopy = amountStr.replace(',', '');
+  let amountStrCopy = amountStr.replace(SHEKEL_CURRENCY_SYMBOL, '');
+  amountStrCopy = amountStrCopy.replaceAll(',', '');
   return parseFloat(amountStrCopy);
 }
 
@@ -131,7 +138,7 @@ function extractTransactionDetails(txnRow: TransactionsTr, transactionStatus: Tr
   return item;
 }
 
-async function getTransactionsColsTypeClasses(page: Page, tableLocator: string): Promise<TransactionsColsTypes> {
+async function getTransactionsColsTypeClasses(page: Page | Frame, tableLocator: string): Promise<TransactionsColsTypes> {
   const result: TransactionsColsTypes = {};
   const typeClassesObjs = await pageEvalAll(page, `${tableLocator} tbody tr:first-of-type td`, null, (tds) => {
     return tds.map((td, index) => ({
@@ -155,7 +162,7 @@ function extractTransaction(txns: ScrapedTransaction[], transactionStatus: Trans
   }
 }
 
-async function extractTransactions(page: Page, tableLocator: string, transactionStatus: TransactionStatuses) {
+async function extractTransactions(page: Page | Frame, tableLocator: string, transactionStatus: TransactionStatuses) {
   const txns: ScrapedTransaction[] = [];
   const transactionsColsTypes = await getTransactionsColsTypeClasses(page, tableLocator);
 
@@ -171,7 +178,7 @@ async function extractTransactions(page: Page, tableLocator: string, transaction
   return txns;
 }
 
-async function isNoTransactionInDateRangeError(page: Page) {
+async function isNoTransactionInDateRangeError(page: Page | Frame) {
   const hasErrorInfoElement = await elementPresentOnPage(page, `.${ERROR_MESSAGE_CLASS}`);
   if (hasErrorInfoElement) {
     const errorText = await page.$eval(`.${ERROR_MESSAGE_CLASS}`, (errorElement) => {
@@ -182,7 +189,7 @@ async function isNoTransactionInDateRangeError(page: Page) {
   return false;
 }
 
-async function searchByDates(page: Page, startDate: Moment) {
+async function searchByDates(page: Page | Frame, startDate: Moment) {
   await clickButton(page, 'a#tabHeader4');
   await waitUntilElementFound(page, 'div#fibi_dates');
   await fillInput(
@@ -195,7 +202,7 @@ async function searchByDates(page: Page, startDate: Moment) {
   await waitForNavigation(page);
 }
 
-async function getAccountNumber(page: Page) {
+async function getAccountNumber(page: Page | Frame) {
   const selectedSnifAccount = await page.$eval(ACCOUNTS_NUMBER, (option) => {
     return (option as HTMLElement).innerText;
   });
@@ -203,18 +210,18 @@ async function getAccountNumber(page: Page) {
   return selectedSnifAccount.replace('/', '_').trim();
 }
 
-async function checkIfHasNextPage(page: Page) {
+async function checkIfHasNextPage(page: Page | Frame) {
   return elementPresentOnPage(page, NEXT_PAGE_LINK);
 }
 
-async function navigateToNextPage(page: Page) {
+async function navigateToNextPage(page: Page | Frame) {
   await clickButton(page, NEXT_PAGE_LINK);
   await waitForNavigation(page);
 }
 
 /* Couldn't reproduce scenario with multiple pages of pending transactions - Should support if exists such case.
    needToPaginate is false if scraping pending transactions */
-async function scrapeTransactions(page: Page, tableLocator: string, transactionStatus: TransactionStatuses, needToPaginate: boolean) {
+async function scrapeTransactions(page: Page | Frame, tableLocator: string, transactionStatus: TransactionStatuses, needToPaginate: boolean) {
   const txns = [];
   let hasNextPage = false;
 
@@ -232,7 +239,7 @@ async function scrapeTransactions(page: Page, tableLocator: string, transactionS
   return convertTransactions(txns);
 }
 
-async function getAccountTransactions(page: Page) {
+async function getAccountTransactions(page: Page | Frame) {
   await Promise.race([
     waitUntilElementFound(page, 'div[id*=\'divTable\']', false),
     waitUntilElementFound(page, `.${ERROR_MESSAGE_CLASS}`, false),
@@ -254,8 +261,12 @@ async function getAccountTransactions(page: Page) {
   return txns;
 }
 
-async function getCurrentBalance(page: Page) {
-  const balanceStr = await page.$eval(CURRENT_BALANCE, (option) => {
+async function getCurrentBalance(page: Page | Frame) {
+  const balanceElement = await page.$(CURRENT_BALANCE);
+  if (!balanceElement) {
+    return undefined;
+  }
+  const balanceStr = await balanceElement.evaluate((option) => {
     return (option as HTMLElement).innerText;
   });
   return getAmountData(balanceStr);
@@ -263,12 +274,14 @@ async function getCurrentBalance(page: Page) {
 
 export async function waitForPostLogin(page: Page) {
   return Promise.race([
-    waitUntilElementFound(page, '#matafLogoutLink', true),
-    waitUntilElementFound(page, '#validationMsg', true),
+    waitUntilElementFound(page, '#card-header', true), // New UI
+    waitUntilElementFound(page, '#account_num', true), // New UI
+    waitUntilElementFound(page, '#matafLogoutLink', true), // Old UI
+    waitUntilElementFound(page, '#validationMsg', true), // Old UI
   ]);
 }
 
-async function fetchAccountData(page: Page, startDate: Moment) {
+async function fetchAccountData(page: Page | Frame, startDate: Moment) {
   await searchByDates(page, startDate);
   const accountNumber = await getAccountNumber(page);
   const balance = await getCurrentBalance(page);
@@ -291,20 +304,51 @@ async function getAccountIdsBySelector(page: Page): Promise<string[]> {
   return accountsIds;
 }
 
-async function fetchAccounts(page: Page, startDate: Moment) {
-  const accounts: TransactionsAccount[] = [];
-  const accountsIds = await getAccountIdsBySelector(page);
-  if (accountsIds.length <= 1) {
-    const accountData = await fetchAccountData(page, startDate);
-    accounts.push(accountData);
-  } else {
-    for (const accountId of accountsIds) {
-      await page.select('#account_num_select', accountId);
-      await waitUntilElementFound(page, '#account_num_select', true);
-      const accountData = await fetchAccountData(page, startDate);
-      accounts.push(accountData);
+async function getTransactionsFrame(page: Page): Promise<Frame | null> {
+  // Try a few times to find the iframe, as it might not be immediately available
+  for (let attempt = 0; attempt < 3; attempt++) {
+    await sleep(2000);
+    const frames = page.frames();
+    const targetFrame = frames.find(f => f.name() === IFRAME_NAME);
+    
+    if (targetFrame) {
+      return targetFrame;
     }
   }
+  
+  return null;
+}
+
+async function selectAccount(page: Page, accountId: string) {
+  await page.select('#account_num_select', accountId);
+  await waitUntilElementFound(page, '#account_num_select', true);
+}
+
+async function fetchAccountDataBothUIs(page: Page, startDate: Moment) {
+  // Try to get the iframe for the new UI
+  const frame = await getTransactionsFrame(page);
+    
+  // Use the frame if available (new UI), otherwise use the page directly (old UI)
+  const targetPage = frame || page;
+  return fetchAccountData(targetPage, startDate);
+}
+
+async function fetchAccounts(page: Page, startDate: Moment):Promise<TransactionsAccount[]> {
+  const accountsIds = await getAccountIdsBySelector(page);
+
+  if (accountsIds.length <= 1) {
+    const accountData = await fetchAccountDataBothUIs(page, startDate);
+    return [accountData];
+  }
+
+  const accounts: TransactionsAccount[] = [];
+  for (const accountId of accountsIds) {
+    await selectAccount(page, accountId);
+    
+    const accountData = await fetchAccountDataBothUIs(page, startDate);
+    accounts.push(accountData);
+  }
+  
   return accounts;
 }
 
@@ -327,15 +371,16 @@ class BeinleumiGroupBaseScraper extends BaseScraperWithBrowser<ScraperSpecificCr
       // HACK: For some reason, though the login button (#continueBtn) is present and visible, the click action does not perform.
       // Adding this delay fixes the issue.
       preAction: async () => {
-        await this.page.waitForTimeout(1000);
+        await sleep(1000);
       },
     };
   }
 
   async fetchData() {
     const defaultStartMoment = moment().subtract(1, 'years').add(1, 'day');
+    const startMomentLimit = moment({ year: 1600 });
     const startDate = this.options.startDate || defaultStartMoment.toDate();
-    const startMoment = moment.max(defaultStartMoment, moment(startDate));
+    const startMoment = moment.max(startMomentLimit, moment(startDate));
 
     await this.navigateTo(this.TRANSACTIONS_URL);
 

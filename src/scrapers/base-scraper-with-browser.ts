@@ -1,17 +1,11 @@
-import puppeteer, {
-  Browser, Frame, Page, LoadEvent,
-} from 'puppeteer';
-
-import {
-  BaseScraper,
-
-} from './base-scraper';
-import { getCurrentUrl, waitForNavigation } from '../helpers/navigation';
-import { clickButton, fillInput, waitUntilElementFound } from '../helpers/elements-interactions';
-import { getDebug } from '../helpers/debug';
-import { ScraperErrorTypes } from './errors';
-import { ScraperScrapingResult, ScraperCredentials } from './interface';
+import puppeteer, { type Frame, type GoToOptions, type Page, type PuppeteerLifeCycleEvent } from 'puppeteer';
 import { ScraperProgressTypes } from '../definitions';
+import { getDebug } from '../helpers/debug';
+import { clickButton, fillInput, waitUntilElementFound } from '../helpers/elements-interactions';
+import { getCurrentUrl, waitForNavigation } from '../helpers/navigation';
+import { BaseScraper } from './base-scraper';
+import { ScraperErrorTypes } from './errors';
+import { type ScraperCredentials, type ScraperScrapingResult } from './interface';
 
 const VIEWPORT_WIDTH = 1024;
 const VIEWPORT_HEIGHT = 768;
@@ -21,7 +15,7 @@ const debug = getDebug('base-scraper-with-browser');
 
 enum LoginBaseResults {
   Success = 'SUCCESS',
-  UnknownError = 'UNKNOWN_ERROR'
+  UnknownError = 'UNKNOWN_ERROR',
 }
 
 const {
@@ -32,25 +26,25 @@ export const LoginResults = {
   ...LoginBaseResults,
 };
 
-export type LoginResults = Exclude<ScraperErrorTypes,
-ScraperErrorTypes.Timeout
-| ScraperErrorTypes.Generic
-| ScraperErrorTypes.General> | LoginBaseResults;
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export type LoginResults =
+  | Exclude<ScraperErrorTypes, ScraperErrorTypes.Timeout | ScraperErrorTypes.Generic | ScraperErrorTypes.General>
+  | LoginBaseResults;
 
 export type PossibleLoginResults = {
-  [key in LoginResults]?: (string | RegExp | ((options?: { page?: Page}) => Promise<boolean>))[]
+  [key in LoginResults]?: (string | RegExp | ((options?: { page?: Page }) => Promise<boolean>))[];
 };
 
 export interface LoginOptions {
   loginUrl: string;
   checkReadiness?: () => Promise<void>;
-  fields: {selector: string, value: string}[];
+  fields: { selector: string, value: string }[];
   submitButtonSelector: string | (() => Promise<void>);
   preAction?: () => Promise<Frame | void>;
   postAction?: () => Promise<void>;
   possibleResults: PossibleLoginResults;
   userAgent?: string;
-  waitUntil?: LoadEvent;
+  waitUntil?: PuppeteerLifeCycleEvent;
 }
 
 async function getKeyByValue(object: PossibleLoginResults, value: string, page: Page): Promise<LoginResults> {
@@ -88,9 +82,7 @@ function createGeneralError(): ScraperScrapingResult {
 }
 
 class BaseScraperWithBrowser<TCredentials extends ScraperCredentials> extends BaseScraper<TCredentials> {
-  // NOTICE - it is discouraged to use bang (!) in general. It is used here because
-  // all the classes that inherit from this base assume is it mandatory.
-  protected browser!: Browser;
+  private cleanups: Array<() => Promise<void>> = [];
 
   // NOTICE - it is discouraged to use bang (!) in general. It is used here because
   // all the classes that inherit from this base assume is it mandatory.
@@ -108,55 +100,24 @@ class BaseScraperWithBrowser<TCredentials extends ScraperCredentials> extends Ba
     debug('initialize scraper');
     this.emitProgress(ScraperProgressTypes.Initializing);
 
-    let env: Record<string, any> | undefined;
-    if (this.options.verbose) {
-      env = { DEBUG: '*', ...process.env };
-    }
+    const page = await this.initializePage();
+    await page.setCacheEnabled(false); // Clear cache and avoid 300's response status
 
-    if (typeof this.options.browser !== 'undefined' && this.options.browser !== null) {
-      debug('use custom browser instance provided in options');
-      this.browser = this.options.browser;
-    } else {
-      const executablePath = this.options.executablePath || undefined;
-      const args = this.options.args || [];
-      const { timeout } = this.options;
-
-      const headless = !this.options.showBrowser;
-      debug(`launch a browser with headless mode = ${headless}`);
-      this.browser = await puppeteer.launch({
-        env,
-        headless,
-        executablePath,
-        args,
-        timeout,
-      });
-    }
-
-    if (this.options.prepareBrowser) {
-      debug('execute \'prepareBrowser\' interceptor provided in options');
-      await this.options.prepareBrowser(this.browser);
-    }
-
-    if (!this.browser) {
-      debug('failed to initiate a browser, exit');
+    if (!page) {
+      debug('failed to initiate a browser page, exit');
       return;
     }
 
-    const pages = await this.browser.pages();
-    if (pages.length) {
-      debug('browser has already pages open, use the first one');
-      [this.page] = pages;
-    } else {
-      debug('create a new browser page');
-      this.page = await this.browser.newPage();
-    }
+    this.page = page;
+
+    this.cleanups.push(() => page.close());
 
     if (this.options.defaultTimeout) {
       this.page.setDefaultTimeout(this.options.defaultTimeout);
     }
 
     if (this.options.preparePage) {
-      debug('execute \'preparePage\' interceptor provided in options');
+      debug("execute 'preparePage' interceptor provided in options");
       await this.options.preparePage(this.page);
     }
 
@@ -172,14 +133,70 @@ class BaseScraperWithBrowser<TCredentials extends ScraperCredentials> extends Ba
     });
   }
 
-  async navigateTo(url: string, page?: Page, timeout?: number, waitUntil: LoadEvent | undefined = 'load'): Promise<void> {
+  private async initializePage() {
+    debug('initialize browser page');
+    if ('browserContext' in this.options) {
+      debug('Using the browser context provided in options');
+      return this.options.browserContext.newPage();
+    }
+
+    if ('browser' in this.options) {
+      debug('Using the browser instance provided in options');
+      const { browser } = this.options;
+
+      /**
+       * For backward compatibility, we will close the browser even if we didn't create it
+       */
+      if (!this.options.skipCloseBrowser) {
+        this.cleanups.push(async () => {
+          debug('closing the browser');
+          await browser.close();
+        });
+      }
+
+      return browser.newPage();
+    }
+
+    const { timeout, args, executablePath, showBrowser } = this.options;
+
+    const headless = !showBrowser;
+    debug(`launch a browser with headless mode = ${headless}`);
+
+    const browser = await puppeteer.launch({
+      env: this.options.verbose ? { DEBUG: '*', ...process.env } : undefined,
+      headless,
+      executablePath,
+      args,
+      timeout,
+    });
+
+    this.cleanups.push(async () => {
+      debug('closing the browser');
+      await browser.close();
+    });
+
+    if (this.options.prepareBrowser) {
+      debug("execute 'prepareBrowser' interceptor provided in options");
+      await this.options.prepareBrowser(browser);
+    }
+
+    debug('create a new browser page');
+    return browser.newPage();
+  }
+
+  async navigateTo(
+    url: string,
+    page?: Page,
+    timeout?: number,
+    waitUntil: PuppeteerLifeCycleEvent | undefined = 'load',
+  ): Promise<void> {
     const pageToUse = page || this.page;
 
     if (!pageToUse) {
       return;
     }
 
-    const options = { ...(timeout === null ? null : { timeout }), waitUntil };
+    const options: GoToOptions = { ...(timeout === null ? null : { timeout }), waitUntil };
     const response = await pageToUse.goto(url, options);
 
     // note: response will be null when navigating to same url while changing the hash part. the condition below will always accept null as valid result.
@@ -193,7 +210,7 @@ class BaseScraperWithBrowser<TCredentials extends ScraperCredentials> extends Ba
     throw new Error(`getLoginOptions() is not created in ${this.options.companyId}`);
   }
 
-  async fillInputs(pageOrFrame: Page | Frame, fields: { selector: string, value: string}[]): Promise<void> {
+  async fillInputs(pageOrFrame: Page | Frame, fields: { selector: string, value: string }[]): Promise<void> {
     const modified = [...fields];
     const input = modified.shift();
 
@@ -222,17 +239,17 @@ class BaseScraperWithBrowser<TCredentials extends ScraperCredentials> extends Ba
     debug('navigate to login url');
     await this.navigateTo(loginOptions.loginUrl, undefined, undefined, loginOptions.waitUntil);
     if (loginOptions.checkReadiness) {
-      debug('execute \'checkReadiness\' interceptor provided in login options');
+      debug("execute 'checkReadiness' interceptor provided in login options");
       await loginOptions.checkReadiness();
     } else if (typeof loginOptions.submitButtonSelector === 'string') {
       debug('wait until submit button is available');
       await waitUntilElementFound(this.page, loginOptions.submitButtonSelector);
     }
 
-    let loginFrameOrPage: (Page | Frame | null) = this.page;
+    let loginFrameOrPage: Page | Frame | null = this.page;
     if (loginOptions.preAction) {
-      debug('execute \'preAction\' interceptor provided in login options');
-      loginFrameOrPage = await loginOptions.preAction() || this.page;
+      debug("execute 'preAction' interceptor provided in login options");
+      loginFrameOrPage = (await loginOptions.preAction()) || this.page;
     }
 
     debug('fill login components input with relevant values');
@@ -246,7 +263,7 @@ class BaseScraperWithBrowser<TCredentials extends ScraperCredentials> extends Ba
     this.emitProgress(ScraperProgressTypes.LoggingIn);
 
     if (loginOptions.postAction) {
-      debug('execute \'postAction\' interceptor provided in login options');
+      debug("execute 'postAction' interceptor provided in login options");
       await loginOptions.postAction();
     } else {
       debug('wait for page navigation');
@@ -272,11 +289,8 @@ class BaseScraperWithBrowser<TCredentials extends ScraperCredentials> extends Ba
       });
     }
 
-    if (!this.browser) {
-      return;
-    }
-
-    await this.browser.close();
+    await Promise.all(this.cleanups.reverse().map((cleanup) => cleanup()));
+    this.cleanups = [];
   }
 
   private handleLoginResult(loginResult: LoginResults) {
@@ -289,8 +303,10 @@ class BaseScraperWithBrowser<TCredentials extends ScraperCredentials> extends Ba
         this.emitProgress(ScraperProgressTypes.LoginFailed);
         return {
           success: false,
-          errorType: loginResult === LoginResults.InvalidPassword ? ScraperErrorTypes.InvalidPassword :
-            ScraperErrorTypes.General,
+          errorType:
+            loginResult === LoginResults.InvalidPassword ?
+              ScraperErrorTypes.InvalidPassword :
+              ScraperErrorTypes.General,
           errorMessage: `Login failed with ${loginResult} error`,
         };
       case LoginResults.ChangePassword:
