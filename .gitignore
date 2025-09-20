@@ -64,3 +64,6 @@ lib/
 .idea
 .vscode
 .DS_Store
+ 
+# Local test credentials (keep secrets out of git)
+src/tests/credentials.local.json

@@ -2,6 +2,7 @@
   "name": "israeli-bank-scrapers",
   "version": "1.0.4",
   "private": true,
+  "type": "module",
   "description": "Provide scrapers for all major Israeli banks and credit card companies",
   "engines": {
     "node": ">= 18.19.0"
@@ -69,6 +70,7 @@
     "rimraf": "^3.0.0",
     "source-map-support": "^0.5.16",
     "ts-jest": "^29.1.4",
+    "ts-node": "^10.9.2",
     "typescript": "^4.7.4"
   },
   "dependencies": {

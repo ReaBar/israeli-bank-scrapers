@@ -140,18 +140,30 @@ function extractTransactionDetails(txnRow: TransactionsTr, transactionStatus: Tr
 
 async function getTransactionsColsTypeClasses(page: Page | Frame, tableLocator: string): Promise<TransactionsColsTypes> {
   const result: TransactionsColsTypes = {};
-  const typeClassesObjs = await pageEvalAll(page, `${tableLocator} tbody tr:first-of-type td`, null, (tds) => {
-    return tds.map((td, index) => ({
-      colClass: td.getAttribute('class'),
-      index,
-    }));
-  });
+  
+  try {
+    // Wait for table and its first row cells to appear
+    await page.waitForSelector(`${tableLocator} tbody tr:first-of-type td`, { timeout: 10000 }).catch(() => {
+      console.log(`Timeout waiting for table ${tableLocator}`);
+      return result;
+    });
+    
+    const typeClassesObjs = await pageEvalAll(page, `${tableLocator} tbody tr:first-of-type td`, null, (tds) => {
+      return tds.map((td, index) => ({
+        colClass: td.getAttribute('class'),
+        index,
+      }));
+    });
 
-  for (const typeClassObj of typeClassesObjs) {
-    if (typeClassObj.colClass) {
-      result[typeClassObj.colClass] = typeClassObj.index;
+    for (const typeClassObj of typeClassesObjs) {
+      if (typeClassObj.colClass) {
+        result[typeClassObj.colClass] = typeClassObj.index;
+      }
     }
+  } catch (error) {
+    console.log(`No columns found in table ${tableLocator}`);
   }
+  
   return result;
 }
 
@@ -163,19 +175,24 @@ function extractTransaction(txns: ScrapedTransaction[], transactionStatus: Trans
 }
 
 async function extractTransactions(page: Page | Frame, tableLocator: string, transactionStatus: TransactionStatuses) {
-  const txns: ScrapedTransaction[] = [];
-  const transactionsColsTypes = await getTransactionsColsTypeClasses(page, tableLocator);
-
-  const transactionsRows = await pageEvalAll<TransactionsTr[]>(page, `${tableLocator} tbody tr`, [], (trs) => {
-    return trs.map((tr) => ({
-      innerTds: Array.from(tr.getElementsByTagName('td')).map((td) => td.innerText),
-    }));
-  });
-
-  for (const txnRow of transactionsRows) {
-    extractTransaction(txns, transactionStatus, txnRow, transactionsColsTypes);
+  try {
+    const txns: ScrapedTransaction[] = [];
+    const transactionsColsTypes = await getTransactionsColsTypeClasses(page, tableLocator);
+  
+    const transactionsRows = await pageEvalAll<TransactionsTr[]>(page, `${tableLocator} tbody tr`, [], (trs) => {
+      return trs.map((tr) => ({
+        innerTds: Array.from(tr.getElementsByTagName('td')).map((td) => td.innerText),
+      }));
+    });
+  
+    for (const txnRow of transactionsRows) {
+      extractTransaction(txns, transactionStatus, txnRow, transactionsColsTypes);
+    }
+    return txns;
+  } catch (error) {
+    console.error('Error extracting transactions:', error);
+    return [];
   }
-  return txns;
 }
 
 async function isNoTransactionInDateRangeError(page: Page | Frame) {
@@ -203,9 +220,16 @@ async function searchByDates(page: Page | Frame, startDate: Moment) {
 }
 
 async function getAccountNumber(page: Page | Frame) {
-  const selectedSnifAccount = await page.$eval(ACCOUNTS_NUMBER, (option) => {
-    return (option as HTMLElement).innerText;
-  });
+  await page.waitForSelector(ACCOUNTS_NUMBER, { timeout: 10000 });
+  let selectedSnifAccount = '';
+  try {
+    selectedSnifAccount = await page.$eval(ACCOUNTS_NUMBER, (option) => {
+      return (option as HTMLElement).innerText;
+    });
+  } catch (error) {
+    console.error('Error extracting account number:', error);
+    return '';
+  }
 
   return selectedSnifAccount.replace('/', '_').trim();
 }

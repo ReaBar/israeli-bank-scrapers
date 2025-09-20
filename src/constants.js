@@ -1,0 +1,13 @@
+"use strict";
+exports.__esModule = true;
+exports.ISO_DATE_REGEX = exports.ISO_DATE_FORMAT = exports.EURO_CURRENCY = exports.EURO_CURRENCY_SYMBOL = exports.DOLLAR_CURRENCY = exports.DOLLAR_CURRENCY_SYMBOL = exports.SHEKEL_CURRENCY = exports.ALT_SHEKEL_CURRENCY = exports.SHEKEL_CURRENCY_KEYWORD = exports.SHEKEL_CURRENCY_SYMBOL = void 0;
+exports.SHEKEL_CURRENCY_SYMBOL = '₪';
+exports.SHEKEL_CURRENCY_KEYWORD = 'ש"ח';
+exports.ALT_SHEKEL_CURRENCY = 'NIS';
+exports.SHEKEL_CURRENCY = 'ILS';
+exports.DOLLAR_CURRENCY_SYMBOL = '$';
+exports.DOLLAR_CURRENCY = 'USD';
+exports.EURO_CURRENCY_SYMBOL = '€';
+exports.EURO_CURRENCY = 'EUR';
+exports.ISO_DATE_FORMAT = 'YYYY-MM-DD[T]HH:mm:ss.SSS[Z]';
+exports.ISO_DATE_REGEX = /^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])T([0-1][0-9]|2[0-3])(:[0-5][0-9]){2}\.[0-9]{3}Z$/;
