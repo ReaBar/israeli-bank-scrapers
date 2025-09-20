@@ -1,0 +1,8 @@
+{
+  "success": false,
+  "errorType": "GENERIC",
+  "errorMessage": "Navigation timeout of 20000 ms exceeded",
+  "scrapedAt": "2025-09-20T13:08:17.654Z",
+  "companyType": "visaCal",
+  "configKey": "visaCal"
+}

@@ -1,0 +1,8 @@
+{
+  "success": false,
+  "errorType": "TIMEOUT",
+  "errorMessage": "waiting for redirect from https://www.max.co.il/login?ReturnURL=https:%2F%2Fwww.max.co.il%2Fhomepage%3FSourceGA%3DAnonymousHeaderCH",
+  "scrapedAt": "2025-09-15T14:44:23.651Z",
+  "companyType": "max",
+  "configKey": "Max Michal"
+}

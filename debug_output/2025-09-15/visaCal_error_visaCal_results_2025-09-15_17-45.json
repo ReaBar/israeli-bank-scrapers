@@ -1,0 +1,8 @@
+{
+  "success": false,
+  "errorType": "GENERIC",
+  "errorMessage": "Unexpected end of JSON input",
+  "scrapedAt": "2025-09-15T14:44:37.522Z",
+  "companyType": "visaCal",
+  "configKey": "visaCal"
+}

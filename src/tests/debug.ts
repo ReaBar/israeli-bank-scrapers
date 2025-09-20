@@ -343,7 +343,7 @@ async function debugScraper() {
     const dateTimeString = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}_${pad(now.getHours())}-${pad(now.getMinutes())}`;
 
     // Save combined results to a single JSON file
-    const outputDir = path.join(__dirname, 'debug_output', dateFolder);
+    const outputDir = path.join(__dirname, '..', '..', 'debug_output', dateFolder);
     if (!fs.existsSync(outputDir)) {
       fs.mkdirSync(outputDir, { recursive: true });
     }

@@ -1,0 +1,68 @@
+{
+  "otsarHahayal": {
+    "error_otsarHahayal": {
+      "success": false,
+      "errorType": "GENERIC",
+      "errorMessage": "Waiting for selector `#card-header` failed: Waiting failed: 20000ms exceeded",
+      "scrapedAt": "2025-09-20T11:53:51.865Z",
+      "companyType": "otsarHahayal",
+      "configKey": "otsarHahayal"
+    }
+  },
+  "max": {
+    "error_max": {
+      "success": false,
+      "errorType": "TIMEOUT",
+      "errorMessage": "waiting for redirect from https://www.max.co.il/login?ReturnURL=https:%2F%2Fwww.max.co.il%2Fhomepage%3FSourceGA%3DAnonymousHeaderCH",
+      "scrapedAt": "2025-09-20T11:54:16.363Z",
+      "companyType": "max",
+      "configKey": "max"
+    },
+    "error_Max Michal": {
+      "success": false,
+      "errorType": "TIMEOUT",
+      "errorMessage": "waiting for redirect from https://www.max.co.il/login?ReturnURL=https:%2F%2Fwww.max.co.il%2Fhomepage%3FSourceGA%3DAnonymousHeaderCH",
+      "scrapedAt": "2025-09-20T11:54:40.752Z",
+      "companyType": "max",
+      "configKey": "Max Michal"
+    }
+  },
+  "visaCal": {
+    "error_visaCal": {
+      "success": false,
+      "errorType": "GENERIC",
+      "errorMessage": "Navigation timeout of 20000 ms exceeded",
+      "scrapedAt": "2025-09-20T11:55:06.098Z",
+      "companyType": "visaCal",
+      "configKey": "visaCal"
+    }
+  },
+  "amex": {
+    "error_amex": {
+      "success": false,
+      "errorType": "GENERIC",
+      "errorMessage": "Unexpected end of JSON input",
+      "scrapedAt": "2025-09-20T11:55:12.078Z",
+      "companyType": "amex",
+      "configKey": "amex"
+    }
+  },
+  "isracard": {
+    "error_isracard": {
+      "success": false,
+      "errorType": "GENERIC",
+      "errorMessage": "Error while trying to navigate to url https://digital.isracard.co.il/personalarea/Login",
+      "scrapedAt": "2025-09-20T11:55:14.907Z",
+      "companyType": "isracard",
+      "configKey": "isracard"
+    },
+    "error_Isracard Michal": {
+      "success": false,
+      "errorType": "GENERIC",
+      "errorMessage": "Unexpected end of JSON input",
+      "scrapedAt": "2025-09-20T11:55:21.278Z",
+      "companyType": "isracard",
+      "configKey": "Isracard Michal"
+    }
+  }
+}

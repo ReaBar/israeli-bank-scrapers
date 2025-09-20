@@ -1,0 +1,68 @@
+{
+  "otsarHahayal": {
+    "error_otsarHahayal": {
+      "success": false,
+      "errorType": "UNKNOWN_ERROR",
+      "errorMessage": "Could not find Chrome (ver. 126.0.6478.126). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: /Users/reabar/.cache/puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.",
+      "scrapedAt": "2025-09-15T14:39:06.281Z",
+      "companyType": "otsarHahayal",
+      "configKey": "otsarHahayal"
+    }
+  },
+  "max": {
+    "error_max": {
+      "success": false,
+      "errorType": "UNKNOWN_ERROR",
+      "errorMessage": "Could not find Chrome (ver. 126.0.6478.126). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: /Users/reabar/.cache/puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.",
+      "scrapedAt": "2025-09-15T14:39:06.290Z",
+      "companyType": "max",
+      "configKey": "max"
+    },
+    "error_Max Michal": {
+      "success": false,
+      "errorType": "UNKNOWN_ERROR",
+      "errorMessage": "Could not find Chrome (ver. 126.0.6478.126). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: /Users/reabar/.cache/puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.",
+      "scrapedAt": "2025-09-15T14:39:06.292Z",
+      "companyType": "max",
+      "configKey": "Max Michal"
+    }
+  },
+  "visaCal": {
+    "error_visaCal": {
+      "success": false,
+      "errorType": "UNKNOWN_ERROR",
+      "errorMessage": "Could not find Chrome (ver. 126.0.6478.126). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: /Users/reabar/.cache/puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.",
+      "scrapedAt": "2025-09-15T14:39:06.293Z",
+      "companyType": "visaCal",
+      "configKey": "visaCal"
+    }
+  },
+  "amex": {
+    "error_amex": {
+      "success": false,
+      "errorType": "UNKNOWN_ERROR",
+      "errorMessage": "Could not find Chrome (ver. 126.0.6478.126). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: /Users/reabar/.cache/puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.",
+      "scrapedAt": "2025-09-15T14:39:06.295Z",
+      "companyType": "amex",
+      "configKey": "amex"
+    }
+  },
+  "isracard": {
+    "error_isracard": {
+      "success": false,
+      "errorType": "UNKNOWN_ERROR",
+      "errorMessage": "Could not find Chrome (ver. 126.0.6478.126). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: /Users/reabar/.cache/puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.",
+      "scrapedAt": "2025-09-15T14:39:06.296Z",
+      "companyType": "isracard",
+      "configKey": "isracard"
+    },
+    "error_Isracard Michal": {
+      "success": false,
+      "errorType": "UNKNOWN_ERROR",
+      "errorMessage": "Could not find Chrome (ver. 126.0.6478.126). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: /Users/reabar/.cache/puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.",
+      "scrapedAt": "2025-09-15T14:39:06.298Z",
+      "companyType": "isracard",
+      "configKey": "Isracard Michal"
+    }
+  }
+}

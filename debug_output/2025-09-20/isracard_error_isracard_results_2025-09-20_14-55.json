@@ -1,0 +1,8 @@
+{
+  "success": false,
+  "errorType": "GENERIC",
+  "errorMessage": "Error while trying to navigate to url https://digital.isracard.co.il/personalarea/Login",
+  "scrapedAt": "2025-09-20T11:55:14.907Z",
+  "companyType": "isracard",
+  "configKey": "isracard"
+}

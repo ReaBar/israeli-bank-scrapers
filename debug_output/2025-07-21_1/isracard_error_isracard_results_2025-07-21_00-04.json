@@ -1,0 +1,8 @@
+{
+  "success": false,
+  "errorType": "GENERIC",
+  "errorMessage": "Navigation timeout of 20000 ms exceeded",
+  "scrapedAt": "2025-07-20T21:04:34.292Z",
+  "companyType": "isracard",
+  "configKey": "isracard"
+}

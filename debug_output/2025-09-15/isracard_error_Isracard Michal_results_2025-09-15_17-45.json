@@ -1,0 +1,8 @@
+{
+  "success": false,
+  "errorType": "GENERIC",
+  "errorMessage": "Unexpected token 'B', \"Block Automation\" is not valid JSON",
+  "scrapedAt": "2025-09-15T14:45:26.811Z",
+  "companyType": "isracard",
+  "configKey": "Isracard Michal"
+}

@@ -1,0 +1,86 @@
+{
+  "success": true,
+  "accountNumber": "6170",
+  "transactions": [
+    {
+      "type": "normal",
+      "identifier": 330441599,
+      "date": "2025-05-12T21:00:00.000Z",
+      "processedDate": "2025-05-19T21:00:00.000Z",
+      "originalAmount": -1942.9,
+      "originalCurrency": "ILS",
+      "chargedAmount": -1942.9,
+      "chargedCurrency": "ILS",
+      "description": "עירית הוד השרון",
+      "memo": "",
+      "status": "completed"
+    },
+    {
+      "type": "normal",
+      "identifier": 583166388,
+      "date": "2025-06-29T21:00:00.000Z",
+      "processedDate": "2025-07-19T21:00:00.000Z",
+      "originalAmount": 139,
+      "originalCurrency": "ILS",
+      "chargedAmount": 139,
+      "chargedCurrency": "ILS",
+      "description": "ניסקו חשמל שקע ותקע",
+      "memo": "זיכוי",
+      "status": "completed"
+    },
+    {
+      "type": "normal",
+      "identifier": 631359013,
+      "date": "2025-07-05T21:00:00.000Z",
+      "processedDate": "2025-07-09T21:00:00.000Z",
+      "originalAmount": -57.9,
+      "originalCurrency": "ILS",
+      "chargedAmount": -57.9,
+      "chargedCurrency": "ILS",
+      "description": "PAYPAL  ALIPAY EUR",
+      "memo": "",
+      "status": "completed"
+    },
+    {
+      "type": "normal",
+      "identifier": 642373698,
+      "date": "2025-07-07T21:00:00.000Z",
+      "processedDate": "2025-07-12T21:00:00.000Z",
+      "originalAmount": -37.23,
+      "originalCurrency": "ILS",
+      "chargedAmount": -37.23,
+      "chargedCurrency": "ILS",
+      "description": "PAYPAL  ALIPAY EUR",
+      "memo": "",
+      "status": "completed"
+    },
+    {
+      "type": "normal",
+      "identifier": 662968967,
+      "date": "2025-07-11T21:00:00.000Z",
+      "processedDate": "2025-07-15T21:00:00.000Z",
+      "originalAmount": -27.04,
+      "originalCurrency": "ILS",
+      "chargedAmount": -27.04,
+      "chargedCurrency": "ILS",
+      "description": "PAYPAL  ALIPAY EUR",
+      "memo": "",
+      "status": "completed"
+    },
+    {
+      "type": "normal",
+      "identifier": 679978936,
+      "date": "2025-07-14T21:00:00.000Z",
+      "processedDate": "2025-07-19T21:00:00.000Z",
+      "originalAmount": -13.44,
+      "originalCurrency": "ILS",
+      "chargedAmount": -13.44,
+      "chargedCurrency": "ILS",
+      "description": "PAYPAL  ALIPAY EUR",
+      "memo": "",
+      "status": "completed"
+    }
+  ],
+  "scrapedAt": "2025-07-20T15:12:15.084Z",
+  "companyType": "isracard"
+}

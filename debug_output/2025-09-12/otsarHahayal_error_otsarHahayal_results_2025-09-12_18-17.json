@@ -1,0 +1,8 @@
+{
+  "success": false,
+  "errorType": "GENERIC",
+  "errorMessage": "Waiting for selector `#card-header` failed: Waiting failed: 20000ms exceeded",
+  "scrapedAt": "2025-09-12T15:15:40.544Z",
+  "companyType": "otsarHahayal",
+  "configKey": "otsarHahayal"
+}

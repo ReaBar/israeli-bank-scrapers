@@ -1,0 +1,65 @@
+{
+  "success": true,
+  "accountNumber": "1921",
+  "transactions": [
+    {
+      "type": "normal",
+      "identifier": 756845274,
+      "date": "2025-07-29T21:00:00.000Z",
+      "processedDate": "2025-08-01T21:00:00.000Z",
+      "originalAmount": -268,
+      "originalCurrency": "ILS",
+      "chargedAmount": -268,
+      "chargedCurrency": "ILS",
+      "description": "לאסט פרייס בע\"מ -סופ",
+      "memo": "",
+      "status": "completed",
+      "hash": "2025-07-29T21:00:00.000Z_-268_לאסט פרייס בע\"מ -סופ__isracard_1921_756845274"
+    },
+    {
+      "type": "normal",
+      "identifier": 789495360,
+      "date": "2025-08-04T21:00:00.000Z",
+      "processedDate": "2025-09-01T21:00:00.000Z",
+      "originalAmount": -599,
+      "originalCurrency": "ILS",
+      "chargedAmount": -599,
+      "chargedCurrency": "ILS",
+      "description": "איבס אביזרי אמבטיה ב",
+      "memo": "",
+      "status": "completed",
+      "hash": "2025-08-04T21:00:00.000Z_-599_איבס אביזרי אמבטיה ב__isracard_1921_789495360"
+    },
+    {
+      "type": "normal",
+      "identifier": 799648597,
+      "date": "2025-08-06T21:00:00.000Z",
+      "processedDate": "2025-09-01T21:00:00.000Z",
+      "originalAmount": -149.9,
+      "originalCurrency": "ILS",
+      "chargedAmount": -149.9,
+      "chargedCurrency": "ILS",
+      "description": "הום סנטר און ליין-יצ",
+      "memo": "",
+      "status": "completed",
+      "hash": "2025-08-06T21:00:00.000Z_-149.9_הום סנטר און ליין-יצ__isracard_1921_799648597"
+    },
+    {
+      "type": "normal",
+      "identifier": 784808275,
+      "date": "2025-08-01T21:00:00.000Z",
+      "processedDate": "2025-09-01T21:00:00.000Z",
+      "originalAmount": -111.19,
+      "originalCurrency": "ILS",
+      "chargedAmount": -111.19,
+      "chargedCurrency": "ILS",
+      "description": "PAYPAL  ALIPAY EUR",
+      "memo": "",
+      "status": "completed",
+      "hash": "2025-08-01T21:00:00.000Z_-111.19_PAYPAL  ALIPAY EUR__isracard_1921_784808275"
+    }
+  ],
+  "scrapedAt": "2025-08-08T19:46:52.334Z",
+  "companyType": "isracard",
+  "configKey": "Isracard Michal"
+}

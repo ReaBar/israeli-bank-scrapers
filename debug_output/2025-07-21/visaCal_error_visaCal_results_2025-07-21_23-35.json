@@ -1,0 +1,8 @@
+{
+  "success": false,
+  "errorType": "GENERIC",
+  "errorMessage": "could not find 'auth-module' in session storage",
+  "scrapedAt": "2025-07-21T20:34:20.781Z",
+  "companyType": "visaCal",
+  "configKey": "visaCal"
+}
